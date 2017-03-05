@@ -24,8 +24,8 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 -- Import Libraries
 local https = require("ssl.https")
 local ltn12 = require("ltn12")
-local encode = require("multipart-post").encode
-local JSON = require("JSON")
+local encode = require("modules.multipart-post").encode
+local JSON = require("modules.JSON")
 
 local M = {} -- Main Bot Framework
 local E = {} -- Extension Framework

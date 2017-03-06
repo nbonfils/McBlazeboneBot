@@ -20,8 +20,34 @@ end
 -- op clearance :)
 local op = Set { "Nils", "Yann" }
 
-
 -- MAIN PROGRAMME
+
+function readLogs (pos)
+    -- TODO
+end
+
+-- override run() to also read server logs
+extension.run = function (limit, timeout)
+    if limit == nil then limit = 1 end
+    if timeout == nil then timeout = 0 end
+    local offset = 0
+    local logPos = 0
+    while true do 
+        -- handle Telegram callbacks
+        local updates = M.getUpdates(offset, limit, timeout)
+        if(updates) then
+            if (updates.result) then
+                for key, update in pairs(updates.result) do
+                    parseUpdateCallbacks(update)
+                    offset = update.update_id + 1
+                end
+            end
+        end
+
+        -- read server logs
+        logPos = readLogs(logPos)
+    end
+end
 
 -- handle text message/commands
 extension.onTextReceive = function (msg)

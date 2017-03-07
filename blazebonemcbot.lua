@@ -21,7 +21,7 @@ end
 -- op clearance :)
 local op = Set { "Nils", "Yann" }
 
--- docker basic command
+-- docker base command
 local dockerCmd = "sudo docker exec -e TERM=xterm ftb minecraft console "
 
 -- MAIN PROGRAMME

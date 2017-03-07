@@ -1,6 +1,12 @@
 # Token for the bot
 token
 
+# ChatId of our minecraft conversation
+chatid
+
+# Example logs for tests
+example.log
+
 # Compiled Lua sources
 luac.out
 

@@ -44,16 +44,25 @@ function readLogs (pos)
     logFile:seek("set", pos)
 
     -- handle logs to notify Telegram
-    for line in logFile:lines(l) do
+    for line in logFile:lines() do
         local log, match = line:gsub(".*%[Server thread/INFO%]: ", "")
         if match >= 0 then
 
             -- player log in
             if log:match("joined the game") then
                 local player = log:gsub(" joined the game", "")
-                bot.send(chatId, player .. " just connected")
+                bot.sendMessage(chatId, player .. " just connected")
+            -- player log out
+            elseif log:match("left the game") then
+                local player = log:gsub(" left the game", "")
+                bot.sendMessage(chatId, player .. " disconnected")
+            -- server started
+            elseif log:match("Done.*For help") then
+                bot.sendMessage(chatId, "Server is ready")
+            -- server stopping
+            elseif log:match("Stopping the server") then
+                bot.sendMessage(chatId, "Server is down :(")
             end
-
         end
     end
 
@@ -70,11 +79,11 @@ extension.run = function (limit, timeout)
     local logPos = 0
     while true do 
         -- handle Telegram callbacks
-        local updates = M.getUpdates(offset, limit, timeout)
+        local updates = bot.getUpdates(offset, limit, timeout)
         if(updates) then
             if (updates.result) then
                 for key, update in pairs(updates.result) do
-                    parseUpdateCallbacks(update)
+                    extension.parseUpdateCallbacks(update)
                     offset = update.update_id + 1
                 end
             end

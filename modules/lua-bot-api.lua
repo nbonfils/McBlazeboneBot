@@ -1053,7 +1053,7 @@ local function onUnknownTypeReceive(unknownType)
 end
 E.onUnknownTypeReceive = onUnknownTypeReceive
 
-local function parseUpdateCallbacks(update)
+function parseUpdateCallbacks(update)
   if (update) then
     E.onUpdateReceive(update)
   end
@@ -1113,6 +1113,8 @@ local function parseUpdateCallbacks(update)
     E.onUnknownTypeReceive(update)
   end
 end
+
+E.parseUpdateCallbacks = parseUpdateCallbacks
 
 local function run(limit, timeout)
   if limit == nil then limit = 1 end

@@ -9,6 +9,11 @@ tokenFile:close()
 -- import the bot framework
 local bot, extension = (require "modules.lua-bot-api").configure(token)
 
+-- retrieve chatId of minecraft telegram group
+local chatIdFile = io.open("chatid", "r")
+local chatId = chatIdFile:read("*all")
+chatIdFile:close()
+
 -- define Set data type
 function Set (list)
     local set = {}
@@ -21,10 +26,79 @@ end
 -- op clearance :)
 local op = Set { "Nils", "Yann" }
 
+-- latest.log path
+local logPath = "/srv/minecraft/logs/latest.log"
+local logPath = "example.log"
+
 -- docker base command
 local dockerCmd = "sudo docker exec -e TERM=xterm ftb minecraft console "
 
+
 -- MAIN PROGRAMME
+
+-- read the latest logs from the given position (in bytes) untill the eof
+function readLogs (pos)
+    -- open log file
+    local logFile = io.open(logPath, "r")
+
+    -- check if it is a new log file
+    if pos > logFile:seek("end") then
+        pos = 0
+    end
+
+    logFile:seek("set", pos)
+
+    -- handle logs to notify Telegram
+    for line in logFile:lines() do
+        local log, match = line:gsub(".*%[Server thread/INFO%]: ", "")
+        if match >= 0 then
+
+            -- player log in
+            if log:match("joined the game") then
+                local player = log:gsub(" joined the game", "")
+                bot.sendMessage(chatId, player .. " just connected")
+            -- player log out
+            elseif log:match("left the game") then
+                local player = log:gsub(" left the game", "")
+                bot.sendMessage(chatId, player .. " disconnected")
+            -- server started
+            elseif log:match("Done.*For help") then
+                bot.sendMessage(chatId, "Server is ready")
+            -- server stopping
+            elseif log:match("Stopping the server") then
+                bot.sendMessage(chatId, "Server is down :(")
+            end
+        end
+    end
+
+
+    pos = logFile:seek("end")
+    return pos
+end
+
+-- override run() to also read server logs
+extension.run = function (limit, timeout)
+    if limit == nil then limit = 1 end
+    if timeout == nil then timeout = 0 end
+    local offset = 0
+    local logPos = 0
+    while true do 
+        -- handle Telegram callbacks
+        local updates = bot.getUpdates(offset, limit, timeout)
+        if(updates) then
+            if (updates.result) then
+                for key, update in pairs(updates.result) do
+                    extension.parseUpdateCallbacks(update)
+                    offset = update.update_id + 1
+                end
+            end
+        end
+
+        -- read server logs
+        logPos = readLogs(logPos)
+    end
+end
+
 -- handle text messages/commands
 extension.onTextReceive = function (msg)
     print("new message by", msg.from.first_name, ":", msg.text)
@@ -109,8 +183,5 @@ extension.onTextReceive = function (msg)
     end
 
 end
-
--- read server log and notify telegram
--- TODO
 
 extension.run()

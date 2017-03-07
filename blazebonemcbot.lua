@@ -14,20 +14,12 @@ local chatIdFile = io.open("chatid", "r")
 local chatId = chatIdFile:read("*all")
 chatIdFile:close()
 
--- define Set data type
-function Set (list)
-    local set = {}
-    for _, l in ipairs(list) do
-        set[l] = true
-    end
-    return set
-end
-
 -- op clearance :)
 local opIdFile = io.open("opid", "r")
 local opId = opIdFile:read("*all")
 local op = {}
 for i in opId:gmatch("%S+") do op[i] = true end
+opIdFile:close()
 
 -- latest.log path
 local logPath = "/srv/minecraft/logs/latest.log"
@@ -40,7 +32,7 @@ local dockerCmd = "sudo docker exec -e TERM=xterm ftb minecraft console "
 -- MAIN PROGRAMME
 
 -- read the latest logs from the given position (in bytes) untill the eof
-function readLogs (pos)
+local function readLogs (pos)
     -- open log file
     local logFile = io.open(logPath, "r")
 
@@ -76,8 +68,19 @@ function readLogs (pos)
 
 
     pos = logFile:seek("end")
+    logFile:close()
     return pos
 end
+
+-- get the log file size
+local function getLogFileSize ()
+    -- open the log file and go to the end
+    local logFile = io.open(logPath, "r")
+    local size = logFile:seek("end")
+    logFile:close()
+    return size
+end
+    
 
 -- override run() to also read server logs
 extension.run = function (limit, timeout)
@@ -109,9 +112,20 @@ extension.onTextReceive = function (msg)
 
     -- list online players
     if msg.text == "/list" then
+        local size = getLogFileSize()
+        
         io.popen(dockerCmd .. "list")
-        -- TODO: read log file for output
-        bot.sendMessage(chatId, players)
+        
+        -- reply with the new log lines
+        local logFile = io.open(logPath, "r")
+        logFile:seek("set", size)
+        --logFile:seek("set", size + 1)
+        local response = ""
+        for line in logFile:lines() do
+            local log, match = line:gsub(".*%[Server thread/INFO%]: ", "")
+            response = response .. log .. "\n"
+        end
+        bot.sendMessage(chatId, response)
     end
 
     -- get server status

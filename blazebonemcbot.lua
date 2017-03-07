@@ -24,7 +24,10 @@ function Set (list)
 end
 
 -- op clearance :)
-local op = Set { "Nils", "Yann" }
+local opIdFile = io.open("opid", "r")
+local opId = opIdFile:read("*all")
+local op = {}
+for i in opId:gmatch("%S+") do op[i] = true end
 
 -- latest.log path
 local logPath = "/srv/minecraft/logs/latest.log"
@@ -127,7 +130,7 @@ extension.onTextReceive = function (msg)
 -- TODO: check commands return codes and send message accordingly
 
     -- op commands
-    if op[msg.from.first_name] then
+    if op[tostring(msg.from.id)] then
         -- manage the whitelist
         if string.find(msg.text,"/whitelist") then
             -- whitelist options

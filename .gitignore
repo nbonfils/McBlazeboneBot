@@ -1,9 +1,11 @@
 # Token for the bot
 token
-chatid
 
 # ChatId of our minecraft conversation
 chatid
+
+# OpId for telegram op users
+opid
 
 # Example logs for tests
 example.log

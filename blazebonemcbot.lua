@@ -72,14 +72,6 @@ local function readLogs (pos)
     return pos
 end
 
--- get the log file size
-local function getLogFileSize ()
-    -- open the log file and go to the end
-    local logFile = io.open(logPath, "r")
-    local size = logFile:seek("end")
-    logFile:close()
-    return size
-end
     
 
 -- override run() to also read server logs
@@ -101,8 +93,17 @@ extension.run = function (limit, timeout)
         end
 
         -- read server logs
-        logPos = readLogs(logPos)
+--        logPos = readLogs(logPos)
     end
+end
+
+-- get the log file size
+local function getLogFileSize ()
+    -- open the log file and go to the end
+    local logFile = io.open(logPath, "r")
+    local size = logFile:seek("end")
+    logFile:close()
+    return size
 end
 
 -- handle text messages/commands
@@ -113,18 +114,21 @@ extension.onTextReceive = function (msg)
     -- list online players
     if msg.text == "/list" then
         local size = getLogFileSize()
+        --
+        --use close() otherwise lua does not see logFile changes
+        io.popen(dockerCmd .. "list"):close() 
         
-        io.popen(dockerCmd .. "list")
-        
-        -- reply with the new log lines
+        -- Go just before console command output
         local logFile = io.open(logPath, "r")
         logFile:seek("set", size)
-        --logFile:seek("set", size + 1)
+
+        -- create response from logs
         local response = ""
         for line in logFile:lines() do
-            local log, match = line:gsub(".*%[Server thread/INFO%]: ", "")
+            local log = line:gsub(".*%[Server thread/INFO%]: ", "")
             response = response .. log .. "\n"
         end
+        logFile:close()
         bot.sendMessage(chatId, response)
     end
 

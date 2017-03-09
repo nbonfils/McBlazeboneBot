@@ -22,29 +22,28 @@ for i in opId:gmatch("%S+") do op[i] = true end
 opIdFile:close()
 
 -- latest.log path
-local logPath = "/srv/minecraft/logs/latest.log"
-local logPath = "example.log"
+local mcLogPath = "/srv/minecraft/logs/latest.log"
+mcLogPath = "example.log"
 
 -- docker base command
 local dockerCmd = "sudo docker exec -e TERM=xterm ftb minecraft console "
-
 
 -- MAIN PROGRAMME
 
 -- read the latest logs from the given position (in bytes) untill the eof
 local function readLogs (pos)
     -- open log file
-    local logFile = io.open(logPath, "r")
+    local mcLogFile = io.open(mcLogPath, "r")
 
     -- check if it is a new log file
-    if pos > logFile:seek("end") then
+    if pos > mcLogFile:seek("end") then
         pos = 0
     end
 
-    logFile:seek("set", pos)
+    mcLogFile:seek("set", pos)
 
     -- handle logs to notify Telegram
-    for line in logFile:lines() do
+    for line in mcLogFile:lines() do
         local log, match = line:gsub(".*%[Server thread/INFO%]: ", "")
         if match >= 0 then
 
@@ -67,8 +66,8 @@ local function readLogs (pos)
     end
 
 
-    pos = logFile:seek("end")
-    logFile:close()
+    pos = mcLogFile:seek("end")
+    mcLogFile:close()
     return pos
 end
 
@@ -100,9 +99,9 @@ end
 -- get the log file size
 local function getLogFileSize ()
     -- open the log file and go to the end
-    local logFile = io.open(logPath, "r")
-    local size = logFile:seek("end")
-    logFile:close()
+    local mcLogFile = io.open(mcLogPath, "r")
+    local size = mcLogFile:seek("end")
+    mcLogFile:close()
     return size
 end
 
@@ -115,20 +114,20 @@ extension.onTextReceive = function (msg)
     if msg.text == "/list" then
         local size = getLogFileSize()
         --
-        --use close() otherwise lua does not see logFile changes
+        --use close() otherwise lua does not see mcLogFile changes
         io.popen(dockerCmd .. "list"):close() 
         
         -- Go just before console command output
-        local logFile = io.open(logPath, "r")
-        logFile:seek("set", size)
+        local mcLogFile = io.open(mcLogPath, "r")
+        mcLogFile:seek("set", size)
 
         -- create response from logs
         local response = ""
-        for line in logFile:lines() do
+        for line in mcLogFile:lines() do
             local log = line:gsub(".*%[Server thread/INFO%]: ", "")
             response = response .. log .. "\n"
         end
-        logFile:close()
+        mcLogFile:close()
         bot.sendMessage(chatId, response)
     end
 

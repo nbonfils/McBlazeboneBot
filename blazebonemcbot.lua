@@ -38,7 +38,8 @@ botLogFile:close()
 -- writes the text as a new line to the bot log file
 local function writeLog (text)
     local botLogFile = io.open(botLogPath, "a")
-    botLogFile:write(text, "\n")
+    local logPrefix = os.date("[%H:%M:%S] - ")
+    botLogFile:write(logPrefix, text, "\n")
     botLogFile:close()
 end
 

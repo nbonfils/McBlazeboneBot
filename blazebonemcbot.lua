@@ -23,6 +23,7 @@ opIdFile:close()
 -- latest.log path
 local mcLogPath = "/srv/minecraft/logs/latest.log"
 mcLogPath = "example.log"
+local cleanPattern = ".*%[Server thread/INFO%]: "
 
 -- docker base command
 local dockerCmd = "sudo docker exec -e TERM=xterm ftb minecraft console "
@@ -43,7 +44,7 @@ local function readLogs (pos)
 
     -- handle logs to notify Telegram
     for line in mcLogFile:lines() do
-        local log, match = line:gsub(".*%[Server thread/INFO%]: ", "")
+        local log, match = line:gsub(cleanPattern, "")
         if match >= 0 then
 
             -- player log in
@@ -124,7 +125,7 @@ extension.onTextReceive = function (msg)
         -- create response from logs
         local response = ""
         for line in mcLogFile:lines() do
-            local log = line:gsub(".*%[Server thread/INFO%]: ", "")
+            local log = line:gsub(cleanPattern, "")
             response = response .. log .. "\n"
         end
         mcLogFile:close()
@@ -160,7 +161,7 @@ extension.onTextReceive = function (msg)
                 
                 local mcLogFile = io.open(mcLogPath, "r")
                 mcLogFile:seek("set", size)
-                local response = mcLogFile:read("*line")
+                local response = mcLogFile:read("*line"):gsub(cleanPattern, "")
                 mcLogFile:close()
                 
                 bot.sendMessage(chatId, response)
@@ -175,7 +176,7 @@ extension.onTextReceive = function (msg)
                 
                 local mcLogFile = io.open(mcLogPath, "r")
                 mcLogFile:seek("set", size)
-                local response = mcLogFile:read("*line")
+                local response = mcLogFile:read("*line"):gsub(cleanPattern, "")
                 mcLogFile:close()
                 
                 bot.sendMessage(chatId, response)
@@ -193,7 +194,7 @@ extension.onTextReceive = function (msg)
                 -- create response from logs
                 local response = ""
                 for line in mcLogFile:lines() do
-                    local log = line:gsub(".*%[Server thread/INFO%]: ", "")
+                    local log = line:gsub(cleanPattern, "")
                     response = response .. log .. "\n"
                 end
                 mcLogFile:close()
@@ -212,7 +213,7 @@ extension.onTextReceive = function (msg)
 
             local mcLogFile = io.open(mcLogPath, "r")
             mcLogFile:seek("set", size)
-            local response = mcLogFile:read("*line")
+            local response = mcLogFile:read("*line"):gsub(cleanPattern, "")
             mcLogFile:close()
             
             bot.sendMessage(chatId, response)
@@ -229,13 +230,13 @@ extension.onTextReceive = function (msg)
 
             local mcLogFile = io.open(mcLogPath, "r")
             mcLogFile:seek("set", size)
-            local response = mcLogFile:read("*line")
+            local response = mcLogFile:read("*line"):gsub(cleanPattern, "")
             mcLogFile:close()
             
             bot.sendMessage(chatId, response)
         end
 
-        -- ban a player
+        -- list active bans
         if string.find(msg.text,"/banlist") then
             local entity = string.gsub(msg.text, "/ban ", "") --entity is "players" or "ips"
             local size = getLogFileSize()
@@ -249,7 +250,7 @@ extension.onTextReceive = function (msg)
             -- create response from logs
             local response = ""
             for line in mcLogFile:lines() do
-                local log = line:gsub(".*%[Server thread/INFO%]: ", "")
+                local log = line:gsub(cleanPattern, "")
                 response = response .. log .. "\n"
             end
             mcLogFile:close()
@@ -267,7 +268,7 @@ extension.onTextReceive = function (msg)
 
             local mcLogFile = io.open(mcLogPath, "r")
             mcLogFile:seek("set", size)
-            local response = mcLogFile:read("*line")
+            local response = mcLogFile:read("*line"):gsub(cleanPattern, "")
             mcLogFile:close()
             
             bot.sendMessage(chatId, response)
@@ -282,7 +283,7 @@ extension.onTextReceive = function (msg)
 
             local response = ""
             for line in mcLogFile:lines() do
-                local log = line:gsub(".*%[Server thread/INFO%]: ", "")
+                local log = line:gsub(cleanPattern, "")
                 response = response .. log .. "\n"
             end
             mcLogFile:close()

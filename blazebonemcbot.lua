@@ -275,15 +275,18 @@ extension.onTextReceive = function (msg)
             local size = getLogFileSize()
 
             io.popen(dockerCmd .. "banlist " .. entity):close()
+            writeLog("Executed: " .. dockerCmd .. "banlist " .. entity)
             os.execute("sleep 1")
 
             local mcLogFile = io.open(mcLogPath, "r")
             mcLogFile:seek("set", size)
 
             -- create response from logs
+            writeLog("Answered:")
             local response = ""
             for line in mcLogFile:lines() do
                 local log = line:gsub(cleanPattern, "")
+                writeLog("\t" .. log)
                 response = response .. log .. "\n"
             end
             mcLogFile:close()
@@ -297,6 +300,7 @@ extension.onTextReceive = function (msg)
             local size = getLogFileSize()
             
             io.popen(dockerCmd .. "pardon " .. name):close()
+            writeLog("Executed: " .. dockerCmd .. "pardon " .. name)
             os.execute('sleep 1')
 
             local mcLogFile = io.open(mcLogPath, "r")
@@ -304,12 +308,32 @@ extension.onTextReceive = function (msg)
             local response = mcLogFile:read("*line"):gsub(cleanPattern, "")
             mcLogFile:close()
             
+            writeLog("Answered: " .. response)
             bot.sendMessage(chatId, response)
         end
 
         -- save the world
         if msg.text == "/save" then
-            io.popen(dockerCmd .. "save-all")
+            local size = getLogFileSize()
+
+            io.popen(dockerCmd .. "save-all"):close()
+            os.execute('sleep 1')
+            writeLog("Executed: " .. dockerCmd .. "save-all")
+
+            local mcLogFile = io.open(mcLogPath, "r")
+            mcLogFile:seek("set", size)
+
+            -- create response from logs
+            writeLog("Answered:")
+            local response = ""
+            for line in mcLogFile:lines() do
+                local log = line:gsub(cleanPattern, "")
+                writeLog("\t" .. log)
+                response = response .. log .. "\n"
+            end
+            mcLogFile:close()
+
+            bot.sendMessage(chatId, response)
         end
 
         -- restart the container

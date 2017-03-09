@@ -63,16 +63,20 @@ local function readLogs (pos)
             -- player log in
             if log:match("joined the game") then
                 local player = log:gsub(" joined the game", "")
+                writeLog("detected a login from player: " .. player)
                 bot.sendMessage(chatId, player .. " just connected")
             -- player log out
             elseif log:match("left the game") then
                 local player = log:gsub(" left the game", "")
+                writeLog("detected a logout from player: " .. player)
                 bot.sendMessage(chatId, player .. " disconnected")
             -- server started
             elseif log:match("Done.*For help") then
+                writeLog("detected server done loading !")
                 bot.sendMessage(chatId, "Server is ready")
             -- server stopping
             elseif log:match("Stopping the server") then
+                writeLog("detected server shutdown !")
                 bot.sendMessage(chatId, "Server is down :(")
             end
         end
@@ -120,7 +124,7 @@ end
 
 -- handle text messages/commands
 extension.onTextReceive = function (msg)
-    print("new message by", msg.from.first_name, ":", msg.text)
+    writeLog("new message by " .. msg.from.first_name .. " : " .. msg.text)
     -- commands executed in the minecraft console output to the log file directly
 
     -- list online players

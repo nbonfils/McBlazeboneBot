@@ -129,15 +129,19 @@ extension.onTextReceive = function (msg)
         
         --use close() otherwise lua does not see mcLogFile changes
         io.popen(dockerCmd .. "list"):close() 
+        writeLog("Executed: " .. dockerCmd .. "list")
+        os.execute('sleep 1') --sleep to make sure logs are written before we read
         
         -- Go just before console command output
         local mcLogFile = io.open(mcLogPath, "r")
         mcLogFile:seek("set", size)
 
         -- create response from logs
+        writeLog("Answered:")
         local response = ""
         for line in mcLogFile:lines() do
-            local log = line:gsub(".*%[Server thread/INFO%]: ", "")
+            local log = line:gsub(cleanPattern, "")
+            writeLog("\t" .. log)
             response = response .. log .. "\n"
         end
         mcLogFile:close()
@@ -150,11 +154,13 @@ extension.onTextReceive = function (msg)
         local in_ps = string.find(ps, "ftb")
         local exited = string.find(ps, "Exited")
 
+        local response = ""
         if not in_ps or exited then 
-            bot.sendMessage(chatId, "Server is down")
+            response = "Server is down"
         else
-            bot.sendMessage(chatId, "Server is up (maybe not ready yet)")
+            response = "Server is up (maybe not ready yet)"
         end
+        writeLog("Answered: " .. response)
 
     end
 -- TODO: check commands return codes and send message accordingly
@@ -166,29 +172,135 @@ extension.onTextReceive = function (msg)
             -- whitelist options
             if string.find(msg.text, "add") then
                 local name = string.gsub(msg.text, "/whitelist add ", "")
-                io.popen(dockerCmd .. "whitelist add " .. name)
+                local size = getLogFileSize()
+
+                io.popen(dockerCmd .. "whitelist add " .. name):close()
+                writeLog("Executed: " .. dockerCmd .. "whitelist add " .. name)
+                os.execute("sleep 1")
                 
+                local mcLogFile = io.open(mcLogPath, "r")
+                mcLogFile:seek("set", size)
+                local response = mcLogFile:read("*line"):gsub(cleanPattern, "")
+                mcLogFile:close()
+                
+                writeLog("Answered: " .. response)
+                bot.sendMessage(chatId, response)
+
 
             elseif string.find(msg.text, "remove") then
                 local name = string.gsub(msg.text, "/whitelist remove ", "")
-                io.popen(dockerCmd .. "whitelist remove " .. name)
+                local size = getLogFileSize()
+
+                io.popen(dockerCmd .. "whitelist remove " .. name):close()
+                writeLog("Executed: " .. dockerCmd .. "whitelist remove " .. name)
+                os.execute("sleep 1")
+                
+                local mcLogFile = io.open(mcLogPath, "r")
+                mcLogFile:seek("set", size)
+                local response = mcLogFile:read("*line"):gsub(cleanPattern, "")
+                mcLogFile:close()
+                
+                writeLog("Answered: " .. response)
+                bot.sendMessage(chatId, response)
+
 
             elseif string.find(msg.text, "list") then
-                io.popen(dockerCmd .. "whitelist list")
-                bot.sendMessage(chatId, players)
+                local size = getLogFileSize()
+
+                io.popen(dockerCmd .. "whitelist list"):close()
+                writeLog("Executed: " .. dockerCmd .. "whitelist list")
+                os.execute('sleep 1')
+                
+                local mcLogFile = io.open(mcLogPath, "r")
+                mcLogFile:seek("set", size)
+
+                -- create response from logs
+                writeLog("Answered:")
+                local response = ""
+                for line in mcLogFile:lines() do
+                    local log = line:gsub(cleanPattern, "")
+                    writeLog("\t" .. log)
+                    response = response .. log .. "\n"
+                end
+                mcLogFile:close()
+
+                bot.sendMessage(chatId, response)
             end
         end
 
         -- kick a player
         if string.find(msg.text,"/kick") then
             local name = string.gsub(msg.text, "/kick ", "")
-            io.popen(dockerCmd .. "kick " .. name)
+            local size = getLogFileSize()
+
+            io.popen(dockerCmd .. "kick " .. name):close()
+                writeLog("Executed: " .. dockerCmd .. "kick " .. name)
+            os.execute('sleep 1')
+
+            local mcLogFile = io.open(mcLogPath, "r")
+            mcLogFile:seek("set", size)
+            local response = mcLogFile:read("*line"):gsub(cleanPattern, "")
+            mcLogFile:close()
+            
+            writeLog("Answered: " .. response)
+            bot.sendMessage(chatId, response)
+            
         end
 
         -- ban a player
         if string.find(msg.text,"/ban") then
             local name = string.gsub(msg.text, "/ban ", "")
-            io.popen(dockerCmd .. "ban " .. name)
+            local size = getLogFileSize()
+
+            io.popen(dockerCmd .. "ban " .. name):close()
+            writeLog("Executed: " .. dockerCmd .. "ban " .. name)
+            os.execute('sleep 1')
+
+            local mcLogFile = io.open(mcLogPath, "r")
+            mcLogFile:seek("set", size)
+            local response = mcLogFile:read("*line"):gsub(cleanPattern, "")
+            mcLogFile:close()
+            
+            writeLog("Answered: " .. response)
+            bot.sendMessage(chatId, response)
+        end
+
+        -- list active bans
+        if string.find(msg.text,"/banlist") then
+            local entity = string.gsub(msg.text, "/ban ", "") --entity is "players" or "ips"
+            local size = getLogFileSize()
+
+            io.popen(dockerCmd .. "banlist " .. entity):close()
+            os.execute("sleep 1")
+
+            local mcLogFile = io.open(mcLogPath, "r")
+            mcLogFile:seek("set", size)
+
+            -- create response from logs
+            local response = ""
+            for line in mcLogFile:lines() do
+                local log = line:gsub(cleanPattern, "")
+                response = response .. log .. "\n"
+            end
+            mcLogFile:close()
+
+            bot.sendMessage(chatId, response)
+        end
+        
+        -- pardon/unban a player
+        if string.find(msg.text,"/pardon") then
+            local name = string.gsub(msg.text, "/pardon ", "")
+            local size = getLogFileSize()
+            
+            io.popen(dockerCmd .. "pardon " .. name):close()
+            os.execute('sleep 1')
+
+            local mcLogFile = io.open(mcLogPath, "r")
+            mcLogFile:seek("set", size)
+            local response = mcLogFile:read("*line"):gsub(cleanPattern, "")
+            mcLogFile:close()
+            
+            bot.sendMessage(chatId, response)
         end
 
         -- save the world

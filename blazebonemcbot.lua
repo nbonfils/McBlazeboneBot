@@ -281,6 +281,9 @@ extension.onTextReceive = function (msg)
             io.popen(dockerCmd .. "save-all"):close()
             os.execute("sleep 1")
 
+            local mcLogFile = io.open(mcLogPath, "r")
+            mcLogFile:seek("set", size)
+
             local response = ""
             for line in mcLogFile:lines() do
                 local log = line:gsub(cleanPattern, "")

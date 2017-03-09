@@ -82,13 +82,10 @@ local function readLogs (pos)
         end
     end
 
-
     pos = mcLogFile:seek("end")
     mcLogFile:close()
     return pos
 end
-
-    
 
 -- override run() to also read server logs
 extension.run = function (limit, timeout)
@@ -167,7 +164,6 @@ extension.onTextReceive = function (msg)
         writeLog("Answered: " .. response)
 
     end
--- TODO: check commands return codes and send message accordingly
 
     -- op commands
     if op[tostring(msg.from.id)] then
@@ -328,9 +324,7 @@ extension.onTextReceive = function (msg)
             local err = io.popen("/srv/minecraft/scripts/stop.sh"):read("*all")
             bot.sendMessage(chatId, err)
         end
-
     end
-
 end
 
 extension.run()

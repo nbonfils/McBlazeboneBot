@@ -22,7 +22,7 @@ opIdFile:close()
 
 -- latest.log path
 local mcLogPath = "/srv/minecraft/logs/latest.log"
-mcLogPath = "example.log"
+--mcLogPath = "example.log"
 local cleanPattern = ".*%[Server thread/INFO%]: "
 
 -- docker base command
@@ -221,7 +221,7 @@ extension.onTextReceive = function (msg)
         end
 
         -- ban a player
-        if string.find(msg.text,"/ban") then
+        if string.find(msg.text,"/ban ") then -- match the space, else it executes also with "/banlist" command
             local name = string.gsub(msg.text, "/ban ", "")
             local size = getLogFileSize()
 

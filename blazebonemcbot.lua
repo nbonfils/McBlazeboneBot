@@ -28,7 +28,19 @@ mcLogPath = "example.log"
 -- docker base command
 local dockerCmd = "sudo docker exec -e TERM=xterm ftb minecraft console "
 
--- MAIN PROGRAMME
+-- log file to store output of bot, create "new" blank log file
+local botLogPath = "blazebonemcbot.log"
+local botLogFile = io.open(botLogPath, "w")
+botLogFile:close()
+
+-- MAIN PROGRAMMEi
+
+-- writes the text as a new line to the bot log file
+local function writeLog (text)
+    local botLogFile = io.open(botLogPath, "a")
+    botLogFile:write(text, "\n")
+    botLogFile:close()
+end
 
 -- read the latest logs from the given position (in bytes) untill the eof
 local function readLogs (pos)
@@ -113,7 +125,7 @@ extension.onTextReceive = function (msg)
     -- list online players
     if msg.text == "/list" then
         local size = getLogFileSize()
-        --
+        
         --use close() otherwise lua does not see mcLogFile changes
         io.popen(dockerCmd .. "list"):close() 
         

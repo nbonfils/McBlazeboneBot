@@ -116,7 +116,7 @@ extension.onTextReceive = function (msg)
         
         --use close() otherwise lua does not see mcLogFile changes
         io.popen(dockerCmd .. "list"):close() 
-        io.execute('sleep 1') --sleep to make sure logs are written before we read
+        os.execute('sleep 1') --sleep to make sure logs are written before we read
         
         -- Go just before console command output
         local mcLogFile = io.open(mcLogPath, "r")
@@ -157,7 +157,7 @@ extension.onTextReceive = function (msg)
                 local size = getLogFileSize()
 
                 io.popen(dockerCmd .. "whitelist add " .. name):close()
-                io.execute('sleep 1')
+                os.execute("sleep 1")
                 
                 local mcLogFile = io.open(mcLogPath, "r")
                 mcLogFile:seek("set", size)
@@ -172,7 +172,7 @@ extension.onTextReceive = function (msg)
                 local size = getLogFileSize()
 
                 io.popen(dockerCmd .. "whitelist remove " .. name):close()
-                io.execute('sleep 1')
+                os.execute("sleep 1")
                 
                 local mcLogFile = io.open(mcLogPath, "r")
                 mcLogFile:seek("set", size)
@@ -186,7 +186,7 @@ extension.onTextReceive = function (msg)
                 local size = getLogFileSize()
 
                 io.popen(dockerCmd .. "whitelist list"):close()
-                io.execute('sleep 1')
+                os.execute('sleep 1')
                 
                 local mcLogFile = io.open(mcLogPath, "r")
                 mcLogFile:seek("set", size)
@@ -209,7 +209,7 @@ extension.onTextReceive = function (msg)
             local size = getLogFileSize()
 
             io.popen(dockerCmd .. "kick " .. name):close()
-            io.execute('sleep 1')
+            os.execute('sleep 1')
 
             local mcLogFile = io.open(mcLogPath, "r")
             mcLogFile:seek("set", size)
@@ -226,7 +226,7 @@ extension.onTextReceive = function (msg)
             local size = getLogFileSize()
 
             io.popen(dockerCmd .. "ban " .. name):close()
-            io.execute('sleep 1')
+            os.execute('sleep 1')
 
             local mcLogFile = io.open(mcLogPath, "r")
             mcLogFile:seek("set", size)
@@ -242,7 +242,7 @@ extension.onTextReceive = function (msg)
             local size = getLogFileSize()
 
             io.popen(dockerCmd .. "banlist " .. entity):close()
-            io.execute("sleep 1")
+            os.execute("sleep 1")
 
             local mcLogFile = io.open(mcLogPath, "r")
             mcLogFile:seek("set", size)
@@ -264,7 +264,7 @@ extension.onTextReceive = function (msg)
             local size = getLogFileSize()
             
             io.popen(dockerCmd .. "pardon " .. name):close()
-            io.execute('sleep 1')
+            os.execute('sleep 1')
 
             local mcLogFile = io.open(mcLogPath, "r")
             mcLogFile:seek("set", size)
@@ -279,7 +279,7 @@ extension.onTextReceive = function (msg)
             local size = getLogFileSize()
 
             io.popen(dockerCmd .. "save-all"):close()
-            io.execute("sleep 1")
+            os.execute("sleep 1")
 
             local response = ""
             for line in mcLogFile:lines() do

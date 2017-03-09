@@ -65,11 +65,23 @@ local function readLogs (pos)
                 local player = log:gsub(" joined the game", "")
                 writeLog("detected a login from player: " .. player)
                 bot.sendMessage(chatId, player .. " just connected")
+
+                -- troll
+                if player == "Metalskull" or player == "Yaanst" then
+                    bot.sendMessage(chatId, "Brace yourselves !\n The admins are playing !")
+                elseif player == "Pacco1217" then
+                    bot.sendMessage(chatId, "Don't join him... he's a dick 8==D")
+                end
             -- player log out
             elseif log:match("left the game") then
                 local player = log:gsub(" left the game", "")
                 writeLog("detected a logout from player: " .. player)
                 bot.sendMessage(chatId, player .. " disconnected")
+
+                -- troll
+                if player == "I3ijix" then
+                    bot.sendMessage(chatId, "The fucking griefer left, you can play safely now")
+                end
             -- server started
             elseif log:match("Done.*For help") then
                 writeLog("detected server done loading !")

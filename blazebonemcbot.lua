@@ -93,7 +93,7 @@ extension.run = function (limit, timeout)
         end
 
         -- read server logs
---        logPos = readLogs(logPos)
+        logPos = readLogs(logPos)
     end
 end
 

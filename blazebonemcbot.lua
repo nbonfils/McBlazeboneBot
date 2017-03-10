@@ -22,7 +22,6 @@ opIdFile:close()
 
 -- latest.log path
 local mcLogPath = "/srv/minecraft/logs/latest.log"
-mcLogPath = "example.log"
 
 -- docker base command
 local dockerCmd = "sudo docker exec -e TERM=xterm ftb minecraft console "

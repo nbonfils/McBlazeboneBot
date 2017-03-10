@@ -189,7 +189,7 @@ extension.onTextReceive = function (msg)
     -- op commands
     if op[tostring(msg.from.id)] then
         -- manage the whitelist
-        if string.find(msg.text,"/whitelist") then
+        if string.find(msg.text,"/whitelist ") then
             -- whitelist options
             if string.find(msg.text, "add") then
                 local name = string.gsub(msg.text, "/whitelist add ", "")
@@ -205,7 +205,7 @@ extension.onTextReceive = function (msg)
         end
 
         -- kick a player
-        if string.find(msg.text,"/kick") then
+        if string.find(msg.text,"/kick ") then
             local name = string.gsub(msg.text, "/kick ", "")
             processCmd("kick " .. name, false)
         end
@@ -223,7 +223,7 @@ extension.onTextReceive = function (msg)
         end
         
         -- pardon/unban a player
-        if string.find(msg.text,"/pardon") then
+        if string.find(msg.text,"/pardon ") then
             local name = string.gsub(msg.text, "/pardon ", "")
             processCmd("pardon " .. name, false)
         end
@@ -248,6 +248,19 @@ extension.onTextReceive = function (msg)
         if msg.text == "/stop" then
             local err = io.popen("/srv/minecraft/scripts/stop.sh"):read("*all")
             bot.sendMessage(chatId, err)
+        end
+    else
+        if string.find(msg.text, "/whitelist ")
+                or string.find(msg.text, "/kick ")
+                or string.find(msg.text, "/ban ")
+                or string.find(msg.text, "/banlist")
+                or string.find(msg.text, "/pardon ")
+                or msg.text == "/save"
+                or msg.text == "/restart"
+                or msg.text == "/start"
+                or msg.text == "/stop" then
+            bot.sendMessage(chatId, "HEEEEEEY " .. string.upper(msg.from.first_name) .. " IS A CHEATER, HE TRIED SOME ADMIN COMMANDS !")
+            writeLog("non admin user " .. msg.from.first_name .. " tried some admin commands")
         end
     end
 end

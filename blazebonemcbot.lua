@@ -85,11 +85,11 @@ local function readLogs (pos)
             -- server started
             elseif log:match("Done.*For help") then
                 writeLog("detected server done loading !")
-                bot.sendMessage(chatId, "Server is ready")
+                bot.sendMessage(chatId, "Server is ready \xE2\x9C\x85")
             -- server stopping
             elseif log:match("Stopping the server") then
                 writeLog("detected server shutdown !")
-                bot.sendMessage(chatId, "Server is down :(")
+                bot.sendMessage(chatId, "Server is down \xF0\x9F\x9A\xAB")
             end
         end
     end
@@ -169,9 +169,9 @@ extension.onTextReceive = function (msg)
 
         local response = ""
         if not in_ps or exited then 
-            response = "Server is down"
+            response = "Server is down \xF0\x9F\x9A\xAB"
         else
-            response = "Server is up (maybe not ready yet)"
+            response = "Server is up (maybe not ready yet) \xE2\x9C\x85"
         end
         writeLog("Answered: " .. response)
 

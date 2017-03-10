@@ -7,8 +7,8 @@ chatid
 # OpId for telegram op users
 opid
 
-# Example logs for tests
-example.log
+# All logs for tests
+*.log
 
 # Compiled Lua sources
 luac.out

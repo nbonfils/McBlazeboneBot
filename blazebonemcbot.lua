@@ -22,6 +22,7 @@ opIdFile:close()
 
 -- latest.log path
 local mcLogPath = "/srv/minecraft/logs/latest.log"
+local cleanPattern = ".*%[Server thread/INFO%]: "
 
 -- docker base command
 local dockerCmd = "sudo docker exec -e TERM=xterm ftb minecraft console "
@@ -57,7 +58,7 @@ local function readLogs (pos)
 
     -- handle logs to notify Telegram
     for line in mcLogFile:lines() do
-        local log, match = line:gsub(".*%[Server thread/INFO%]: ", "")
+        local log, match = line:gsub("cleanPattern", "")
         if match >= 0 then
 
             -- player log in

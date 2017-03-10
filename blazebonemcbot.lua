@@ -65,19 +65,31 @@ local function readLogs (pos)
                 local player = log:gsub(" joined the game", "")
                 writeLog("detected a login from player: " .. player)
                 bot.sendMessage(chatId, player .. " just connected")
+
+                -- troll
+                if player == "Metalskull" or player == "Yaanst" then
+                    bot.sendMessage(chatId, "Brace yourselves !\n The admins are playing !")
+                elseif player == "Pacco1217" then
+                    bot.sendMessage(chatId, "Don't join him... he's a dick 8==D")
+                end
             -- player log out
             elseif log:match("left the game") then
                 local player = log:gsub(" left the game", "")
                 writeLog("detected a logout from player: " .. player)
                 bot.sendMessage(chatId, player .. " disconnected")
+
+                -- troll
+                if player == "I3ijix" then
+                    bot.sendMessage(chatId, "The fucking griefer left, you can play safely now")
+                end
             -- server started
             elseif log:match("Done.*For help") then
                 writeLog("detected server done loading !")
-                bot.sendMessage(chatId, "Server is ready")
+                bot.sendMessage(chatId, "Server is ready \xE2\x9C\x85")
             -- server stopping
             elseif log:match("Stopping the server") then
                 writeLog("detected server shutdown !")
-                bot.sendMessage(chatId, "Server is down :(")
+                bot.sendMessage(chatId, "Server is down \xF0\x9F\x9A\xAB")
             end
         end
     end
@@ -157,9 +169,9 @@ extension.onTextReceive = function (msg)
 
         local response = ""
         if not in_ps or exited then 
-            response = "Server is down"
+            response = "Server is down \xF0\x9F\x9A\xAB"
         else
-            response = "Server is up (maybe not ready yet)"
+            response = "Server is up (maybe not ready yet) \xE2\x9C\x85"
         end
         writeLog("Answered: " .. response)
 

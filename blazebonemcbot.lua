@@ -1,3 +1,5 @@
+#!/usr/bin/env lua
+
 -- VARIABLES DEFINITIONS
 
 -- retrieve the Telegram bot token, so it's not hardcoded
@@ -58,7 +60,7 @@ local function readLogs (pos)
 
     -- handle logs to notify Telegram
     for line in mcLogFile:lines() do
-        local log, match = line:gsub("cleanPattern", "")
+        local log, match = line:gsub(cleanPattern, "")
         if match >= 0 then
 
             -- player log in
@@ -128,7 +130,7 @@ extension.run = function (limit, timeout)
         end
 
         -- read server logs
-        --logPos = readLogs(logPos)
+        logPos = readLogs(logPos)
     end
 end
 
@@ -184,6 +186,30 @@ extension.onTextReceive = function (msg)
         end
         writeLog("Answered: " .. response)
 
+    end
+
+    -- check CPU temperature levels
+    if msg.text == "/sensors" then
+        -- use [[ ]] to represent a string that does not escape characters such as \d
+        local cmd = [[sensors | grep -P "temp\d" | cut -d "(" -f 1]]
+        local response = io.popen(cmd):read("*all"):close()
+        writeLog("Executed: " .. cmd)
+        writeLog("Answered: ")
+        for line in response:lines() do
+            writeLog("\t " .. line)
+        end
+        bot.sendMessage(chatId, response)
+
+    end
+
+    -- check load averages of the server
+    if msg.text == "/load" then
+        -- use [[ ]] to represent a string that does not escape characters such as \d
+        local cmd = [[cat /proc/loadavg | grep -oP "(\d\.\d{2} ){3}"]]
+        local response = io.popen(cmd):read("*all"):close()
+        writeLog("Executed: " .. cmd)
+        writeLog("Answered: " .. response)
+        bot.sendMessage(chatId, response)
     end
 
     -- op commands

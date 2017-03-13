@@ -27,7 +27,7 @@ local mcLogPath = "/srv/minecraft/logs/latest.log"
 local cleanPattern = ".*%[Server thread/INFO%]: "
 
 -- docker base command
-local dockerCmd = "sudo docker exec -e TERM=xterm ftb minecraft console "
+local dockerCmd = "docker exec -e TERM=xterm ftb minecraft console "
 
 -- log file to store output of bot, create "new" blank log file
 local botLogPath = "blazebonemcbot.log"

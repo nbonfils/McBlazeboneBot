@@ -261,7 +261,7 @@ extension.onTextReceive = function (msg)
 
         -- restart the container
         if msg.text == "/restart" then
-            local err = io.popen("/srv/minecraft/scripts/restart.sh"):read("*all")
+            local err = io.popen("./scripts/restart.sh"):read("*all")
             bot.sendMessage(chatId, err)
         end
 
@@ -272,7 +272,7 @@ extension.onTextReceive = function (msg)
 
         -- stop the container
         if msg.text == "/stop" then
-            local err = io.popen("/srv/minecraft/scripts/stop.sh"):read("*all")
+            local err = io.popen("./scripts/stop.sh"):read("*all")
             bot.sendMessage(chatId, err)
         end
     else

@@ -3,20 +3,20 @@
 -- VARIABLES DEFINITIONS
 
 -- retrieve the Telegram bot token, so it's not hardcoded
-local tokenFile = io.open("token", "r")
+local tokenFile = io.open("/srv/minecraft/blazebonemcbot/token", "r")
 local token = tokenFile:read("*all")
 tokenFile:close()
 
 -- import the bot framework
-local bot, extension = (require "modules.lua-bot-api").configure(token)
+local bot, extension = (require "srv.minecraft.blazebonemcbot.modules.lua-bot-api").configure(token)
 
 -- retrieve chatId of minecraft telegram group
-local chatIdFile = io.open("chatid", "r")
+local chatIdFile = io.open("/srv/minecraft/blazebonemcbot/chatid", "r")
 local chatId = chatIdFile:read("*all")
 chatIdFile:close()
 
 -- op clearance :)
-local opIdFile = io.open("opid", "r")
+local opIdFile = io.open("/srv/minecraft/blazebonemcbot/opid", "r")
 local opId = opIdFile:read("*all")
 local op = {}
 for i in opId:gmatch("%S+") do op[i] = true end
@@ -30,7 +30,7 @@ local cleanPattern = ".*%[Server thread/INFO%]: "
 local dockerCmd = "docker exec -e TERM=xterm ftb minecraft console "
 
 -- log file to store output of bot, create "new" blank log file
-local botLogPath = "blazebonemcbot.log"
+local botLogPath = "/srv/minecraft/blazebonemcbot/blazebonemcbot.log"
 local botLogFile = io.open(botLogPath, "w")
 botLogFile:close()
 
@@ -88,11 +88,11 @@ local function readLogs (pos)
             -- server started
             elseif log:match("Done.*For help") then
                 writeLog("detected server done loading !")
-                bot.sendMessage(chatId, "Server is ready \xE2\x9C\x85")
+                bot.sendMessage(chatId, "Server is ready " .. string.char(0xE2, 0x9C, 0x85))
             -- server stopping
             elseif log:match("Stopping the server") then
                 writeLog("detected server shutdown !")
-                bot.sendMessage(chatId, "Server is down \xF0\x9F\x9A\xAB")
+                bot.sendMessage(chatId, "Server is down " .. string.char(0xF0, 0x9F, 0x9A, 0xAB))
             end
         end
     end
@@ -180,11 +180,12 @@ extension.onTextReceive = function (msg)
 
         local response = ""
         if not in_ps or exited then 
-            response = "Server is down \xF0\x9F\x9A\xAB"
+            response = "Server is down" .. string.char(0xF0, 0x9F, 0x9A, 0xAB)
         else
-            response = "Server is up (maybe not ready yet) \xE2\x9C\x85"
+            response = "Server is up (maybe not ready yet) " .. string.char(0xE2, 0x9C, 0x85)
         end
         writeLog("Answered: " .. response)
+	bot.sendMessage(chatId, response)
 
     end
 
@@ -192,24 +193,28 @@ extension.onTextReceive = function (msg)
     if msg.text == "/sensors" then
         -- use [[ ]] to represent a string that does not escape characters such as \d
         local cmd = [[sensors | grep -P "temp\d" | cut -d "(" -f 1]]
-        local response = io.popen(cmd):read("*all"):close()
+        local cmd_stdout = io.popen(cmd)
         writeLog("Executed: " .. cmd)
         writeLog("Answered: ")
-        for line in response:lines() do
+        local response = ""
+	for line in cmd_stdout:lines() do
+	    response = response .. line .. "\n"
             writeLog("\t " .. line)
         end
         bot.sendMessage(chatId, response)
-
+	cmd_stdout:close()
     end
 
     -- check load averages of the server
     if msg.text == "/load" then
         -- use [[ ]] to represent a string that does not escape characters such as \d
         local cmd = [[cat /proc/loadavg | grep -oP "(\d\.\d{2} ){3}"]]
-        local response = io.popen(cmd):read("*all"):close()
+        local cmd_stdout = io.popen(cmd)
+	local response = cmd_stdout:read("*all")
         writeLog("Executed: " .. cmd)
         writeLog("Answered: " .. response)
         bot.sendMessage(chatId, response)
+	cmd_stdout:close()
     end
 
     -- op commands

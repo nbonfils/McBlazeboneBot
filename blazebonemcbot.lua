@@ -2,13 +2,16 @@
 
 -- VARIABLES DEFINITIONS
 
+-- add the module path fro the imports
+package.path = package.path .. ";/srv/minecraft/blazebonemcbot/modules/?.lua"
+
 -- retrieve the Telegram bot token, so it's not hardcoded
 local tokenFile = io.open("token", "r")
 local token = tokenFile:read("*all")
 tokenFile:close()
 
 -- import the bot framework
-local bot, extension = (require "modules.lua-bot-api").configure(token)
+local bot, extension = (require "lua-bot-api").configure(token)
 
 -- retrieve chatId of minecraft telegram group
 local chatIdFile = io.open("chatid", "r")
